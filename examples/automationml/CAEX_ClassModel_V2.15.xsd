@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- CAEX - Computer Aided Engineering Data-Exchange-Metamodel -->
+<!-- Version 2.15, 16.05.2007 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="qualified">
+  <xs:simpleType name="ChangeMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="state"/>
+      <xs:enumeration value="create"/>
+      <xs:enumeration value="delete"/>
+      <xs:enumeration value="change"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:group name="Header">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Description">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute default="state" name="ChangeMode" type="ChangeMode" use="optional"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Version">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute default="state" name="ChangeMode" type="ChangeMode" use="optional"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="Revision">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="CAEXBasicObject">
+              <xs:sequence>
+                <xs:element name="RevisionDate" type="xs:dateTime"/>
+                <xs:element minOccurs="0" name="OldVersion" type="xs:string"/>
+                <xs:element minOccurs="0" name="NewVersion" type="xs:string"/>
+                <xs:element name="AuthorName" type="xs:string"/>
+                <xs:element minOccurs="0" name="Comment" type="xs:string"/>
+              </xs:sequence>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element minOccurs="0" name="Copyright">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute default="state" name="ChangeMode" type="ChangeMode" use="optional"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="AdditionalInformation" type="xs:anyType"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="CAEXBasicObject">
+    <xs:group minOccurs="0" ref="Header"/>
+    <xs:attribute default="state" name="ChangeMode" type="ChangeMode" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="CAEXObject">
+    <xs:complexContent>
+      <xs:extension base="CAEXBasicObject">
+        <xs:attribute name="ID" type="xs:string" use="optional"/>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InterfaceClassType">
+    <xs:complexContent>
+      <xs:extension base="CAEXObject">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Attribute" type="AttributeType"/>
+        </xs:sequence>
+        <xs:attribute name="RefBaseClassPath" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InterfaceFamilyType">
+    <xs:complexContent>
+      <xs:extension base="InterfaceClassType">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="InterfaceClass" type="InterfaceFamilyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoleClassType">
+    <xs:complexContent>
+      <xs:extension base="CAEXObject">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Attribute" type="AttributeType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="ExternalInterface">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="InterfaceClassType"/>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+        <xs:attribute name="RefBaseClassPath" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="RoleFamilyType">
+    <xs:complexContent>
+      <xs:extension base="RoleClassType">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="RoleClass" type="RoleFamilyType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SystemUnitClassType">
+    <xs:complexContent>
+      <xs:extension base="CAEXObject">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Attribute" type="AttributeType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="ExternalInterface" type="InterfaceClassType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="InternalElement" type="InternalElementType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="SupportedRoleClass">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXBasicObject">
+                  <xs:sequence minOccurs="0">
+                    <xs:element minOccurs="0" name="MappingObject" type="MappingType"/>
+                  </xs:sequence>
+                  <xs:attribute name="RefRoleClassPath" type="xs:string" use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="InternalLink">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXObject">
+                  <xs:attribute name="RefPartnerSideA" type="xs:string" use="optional"/>
+                  <xs:attribute name="RefPartnerSideB" type="xs:string" use="optional"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="SystemUnitFamilyType">
+    <xs:complexContent>
+      <xs:extension base="SystemUnitClassType">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="SystemUnitClass" type="SystemUnitFamilyType"/>
+        </xs:sequence>
+        <xs:attribute name="RefBaseClassPath" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="InternalElementType">
+    <xs:complexContent>
+      <xs:extension base="SystemUnitClassType">
+        <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" name="RoleRequirements">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXBasicObject">
+                  <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="Attribute" type="AttributeType"/>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="ExternalInterface" type="InterfaceClassType"/>
+                  </xs:sequence>
+                  <xs:attribute name="RefBaseRoleClassPath" type="xs:string" use="optional"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element minOccurs="0" name="MappingObject" type="MappingType"/>
+        </xs:sequence>
+        <xs:attribute name="RefBaseSystemUnitPath" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AttributeType">
+    <xs:complexContent>
+      <xs:extension base="CAEXObject">
+        <xs:sequence minOccurs="0">
+          <xs:element minOccurs="0" name="DefaultValue" type="xs:anyType"/>
+          <xs:element minOccurs="0" name="Value" type="xs:anyType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="RefSemantic">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXBasicObject">
+                  <xs:attribute name="CorrespondingAttributePath" type="xs:string" use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Constraint" type="AttributeValueRequirementType"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="Attribute" type="AttributeType"/>
+        </xs:sequence>
+        <xs:attribute name="Unit" type="xs:string" use="optional"/>
+        <xs:attribute name="AttributeDataType" type="xs:string" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="AttributeValueRequirementType">
+    <xs:complexContent>
+      <xs:extension base="CAEXBasicObject">
+        <xs:choice>
+          <xs:element name="OrdinalScaledType">
+            <xs:complexType>
+              <xs:sequence minOccurs="0">
+                <xs:element minOccurs="0" name="RequiredMaxValue" type="xs:anyType"/>
+                <xs:element minOccurs="0" name="RequiredValue" type="xs:anyType"/>
+                <xs:element minOccurs="0" name="RequiredMinValue" type="xs:anyType"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="NominalScaledType">
+            <xs:complexType>
+              <xs:sequence minOccurs="0">
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="RequiredValue" type="xs:anyType"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="UnknownType">
+            <xs:complexType>
+              <xs:sequence minOccurs="0">
+                <xs:element name="Requirements" type="xs:string"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="MappingType">
+    <xs:complexContent>
+      <xs:extension base="CAEXBasicObject">
+        <xs:sequence minOccurs="0">
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="AttributeNameMapping">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXBasicObject">
+                  <xs:attribute name="SystemUnitAttributeName" type="xs:string" use="required"/>
+                  <xs:attribute name="RoleAttributeName" type="xs:string" use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="InterfaceNameMapping">
+            <xs:complexType>
+              <xs:complexContent>
+                <xs:extension base="CAEXBasicObject">
+                  <xs:attribute name="SystemUnitInterfaceName" type="xs:string" use="required"/>
+                  <xs:attribute name="RoleInterfaceName" type="xs:string" use="required"/>
+                </xs:extension>
+              </xs:complexContent>
+            </xs:complexType>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="CAEXFile">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="CAEXBasicObject">
+          <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="ExternalReference">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="CAEXBasicObject">
+                    <xs:attribute name="Path" type="xs:string" use="required"/>
+                    <xs:attribute name="Alias" type="xs:string" use="required"/>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="InstanceHierarchy">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="CAEXObject">
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" minOccurs="0" name="InternalElement" type="InternalElementType"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="InterfaceClassLib">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="CAEXObject">
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" minOccurs="0" name="InterfaceClass" type="InterfaceFamilyType"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="RoleClassLib">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="CAEXObject">
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" minOccurs="0" name="RoleClass" type="RoleFamilyType"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="SystemUnitClassLib">
+              <xs:complexType>
+                <xs:complexContent>
+                  <xs:extension base="CAEXObject">
+                    <xs:sequence>
+                      <xs:element maxOccurs="unbounded" minOccurs="0" name="SystemUnitClass" type="SystemUnitFamilyType"/>
+                    </xs:sequence>
+                  </xs:extension>
+                </xs:complexContent>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute name="FileName" type="xs:string" use="required"/>
+          <xs:attribute fixed="2.15" name="SchemaVersion" type="xs:string" use="required"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

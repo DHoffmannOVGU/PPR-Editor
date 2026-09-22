@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!--
+      Chromium reports "ResizeObserver loop completed with undelivered
+      notifications" as a window error carrying no Error object whenever
+      observed elements settle across two frames. React Flow measures every
+      node that way, so adding or reprojecting nodes raises it routinely. It is
+      a browser notice rather than an application fault, but the dev
+      runtime-error overlay turns it into a full-screen modal that swallows
+      every canvas gesture behind it. This listener has to win the race against
+      the overlay's own listener, and a classic script runs while the document
+      is still parsing, before any deferred module the dev server injects.
+    -->
+    <script>
+      window.addEventListener('error', function (event) {
+        if (event.error || event.message.indexOf('ResizeObserver loop') !== 0) return;
+        event.stopImmediatePropagation();
+        event.preventDefault();
+      });
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <title>AutomationML PPR Modeler</title>
+    <meta name="description" content="AutomationML-oriented PPR engineering workspace for modeling products, processes, resources, and their relationships." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="AutomationML PPR Modeler" />
+    <meta property="og:description" content="AutomationML-oriented PPR engineering workspace for modeling products, processes, resources, and their relationships." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="AutomationML PPR Modeler" />
+    <meta name="twitter:description" content="AutomationML-oriented PPR engineering workspace for modeling products, processes, resources, and their relationships." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

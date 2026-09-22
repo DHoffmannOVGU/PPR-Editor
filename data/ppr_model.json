@@ -1,0 +1,576 @@
+{
+  "id": "model_two_stage_finished_product",
+  "name": "Two-Stage Finished Product",
+  "description": "A compact production line with an input, an intermediate product, a final product, two processes, and one dedicated resource for each process.",
+  "schema_version": "2.0",
+  "library": {
+    "definitions": [
+      {
+        "id": "def_raw_material",
+        "name": "Raw Material",
+        "description": "Incoming material for the first operation.",
+        "attributes": [
+          {
+            "id": "attr_raw_material_grade",
+            "name": "material grade",
+            "value": "AL-6061-T6",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_raw_material_supplier",
+            "name": "supplier code",
+            "value": "SUP-AL-01",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 80.0,
+        "y": 250.0,
+        "type": "product",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_intermediate_part",
+        "name": "Intermediate Part",
+        "description": "Part produced by the first operation and consumed by the second.",
+        "attributes": [
+          {
+            "id": "attr_intermediate_target_mass",
+            "name": "target mass",
+            "value": "0.82",
+            "datatype": "real",
+            "unit": "kg"
+          },
+          {
+            "id": "attr_intermediate_tolerance",
+            "name": "dimensional tolerance",
+            "value": "0.1",
+            "datatype": "real",
+            "unit": "mm"
+          }
+        ],
+        "x": 620.0,
+        "y": 250.0,
+        "type": "product",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_finished_product",
+        "name": "Finished Product",
+        "description": "Final product released after the second operation.",
+        "attributes": [
+          {
+            "id": "attr_finished_part_number",
+            "name": "part number",
+            "value": "FP-100",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_finished_release_status",
+            "name": "release status",
+            "value": "released",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 1160.0,
+        "y": 250.0,
+        "type": "product",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_form_part",
+        "name": "Form Part",
+        "description": "Form the incoming material into the intermediate part.",
+        "attributes": [
+          {
+            "id": "attr_form_cycle_time",
+            "name": "cycle time",
+            "value": "18",
+            "datatype": "real",
+            "unit": "s"
+          },
+          {
+            "id": "attr_form_mode",
+            "name": "operation mode",
+            "value": "automatic",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 350.0,
+        "y": 80.0,
+        "type": "process",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_finish_part",
+        "name": "Finish Part",
+        "description": "Finish and release the intermediate part.",
+        "attributes": [
+          {
+            "id": "attr_finish_cycle_time",
+            "name": "cycle time",
+            "value": "24",
+            "datatype": "real",
+            "unit": "s"
+          },
+          {
+            "id": "attr_finish_inspection",
+            "name": "inspection required",
+            "value": true,
+            "datatype": "boolean",
+            "unit": null
+          }
+        ],
+        "x": 890.0,
+        "y": 80.0,
+        "type": "process",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_forming_station",
+        "name": "Forming Station",
+        "description": "Dedicated station for the forming operation.",
+        "attributes": [
+          {
+            "id": "attr_forming_capacity",
+            "name": "rated capacity",
+            "value": "120",
+            "datatype": "integer",
+            "unit": null
+          },
+          {
+            "id": "attr_forming_control",
+            "name": "control mode",
+            "value": "automatic",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 350.0,
+        "y": 500.0,
+        "type": "resource",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "def_finishing_station",
+        "name": "Finishing Station",
+        "description": "Dedicated station for the finishing operation.",
+        "attributes": [
+          {
+            "id": "attr_finishing_capacity",
+            "name": "rated capacity",
+            "value": "90",
+            "datatype": "integer",
+            "unit": null
+          },
+          {
+            "id": "attr_finishing_gate",
+            "name": "quality gate",
+            "value": "dimensional",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 890.0,
+        "y": 500.0,
+        "type": "resource",
+        "kind": "definition",
+        "definition_id": null,
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      }
+    ]
+  },
+  "diagram": {
+    "usages": [
+      {
+        "id": "use_raw_material",
+        "name": "Raw Material Infeed",
+        "description": "Material entering the line.",
+        "attributes": [
+          {
+            "id": "attr_raw_material_lot",
+            "name": "lot id",
+            "value": "RM-2401",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_raw_material_available",
+            "name": "availability",
+            "value": "allocated",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 420.0,
+        "y": 80.0,
+        "type": "product",
+        "kind": "usage",
+        "definition_id": "def_raw_material",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_intermediate_part",
+        "name": "Intermediate Part",
+        "description": "Part passed from forming to finishing.",
+        "attributes": [
+          {
+            "id": "attr_intermediate_mass",
+            "name": "measured mass",
+            "value": "0.82",
+            "datatype": "real",
+            "unit": "kg"
+          },
+          {
+            "id": "attr_intermediate_state",
+            "name": "state",
+            "value": "formed",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 420.0,
+        "y": 500.0,
+        "type": "product",
+        "kind": "usage",
+        "definition_id": "def_intermediate_part",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_finished_product",
+        "name": "Finished Product",
+        "description": "Released output of the line.",
+        "attributes": [
+          {
+            "id": "attr_finished_serial",
+            "name": "serial number",
+            "value": "FP-100-0001",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_finished_release",
+            "name": "release status",
+            "value": "released",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 420.0,
+        "y": 920.0,
+        "type": "product",
+        "kind": "usage",
+        "definition_id": "def_finished_product",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_form_part",
+        "name": "Form Part",
+        "description": "First production operation.",
+        "attributes": [
+          {
+            "id": "attr_form_actual_cycle",
+            "name": "actual cycle time",
+            "value": "18.4",
+            "datatype": "real",
+            "unit": "s"
+          },
+          {
+            "id": "attr_form_operator",
+            "name": "operator mode",
+            "value": "automatic",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 420.0,
+        "y": 290.0,
+        "type": "process",
+        "kind": "usage",
+        "definition_id": "def_form_part",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_finish_part",
+        "name": "Finish Part",
+        "description": "Second production operation.",
+        "attributes": [
+          {
+            "id": "attr_finish_actual_cycle",
+            "name": "actual cycle time",
+            "value": "24.1",
+            "datatype": "real",
+            "unit": "s"
+          },
+          {
+            "id": "attr_finish_result",
+            "name": "inspection result",
+            "value": "passed",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 420.0,
+        "y": 710.0,
+        "type": "process",
+        "kind": "usage",
+        "definition_id": "def_finish_part",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_forming_station",
+        "name": "Forming Station FS-01",
+        "description": "Resource assigned to forming.",
+        "attributes": [
+          {
+            "id": "attr_forming_station_asset_id",
+            "name": "asset id",
+            "value": "FS-01",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_forming_station_status",
+            "name": "availability",
+            "value": "available",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 760.0,
+        "y": 290.0,
+        "type": "resource",
+        "kind": "usage",
+        "definition_id": "def_forming_station",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      },
+      {
+        "id": "use_finishing_station",
+        "name": "Finishing Station FN-01",
+        "description": "Resource assigned to finishing.",
+        "attributes": [
+          {
+            "id": "attr_finishing_station_asset_id",
+            "name": "asset id",
+            "value": "FN-01",
+            "datatype": "string",
+            "unit": null
+          },
+          {
+            "id": "attr_finishing_station_status",
+            "name": "availability",
+            "value": "available",
+            "datatype": "string",
+            "unit": null
+          }
+        ],
+        "x": 760.0,
+        "y": 710.0,
+        "type": "resource",
+        "kind": "usage",
+        "definition_id": "def_finishing_station",
+        "domain": null,
+        "parent_definition_id": null,
+        "visible_in_ppr": true,
+        "state": null,
+        "states": null
+      }
+    ],
+    "relationships": [
+      {
+        "id": "rel_raw_to_form",
+        "source_id": "use_raw_material",
+        "target_id": "use_form_part",
+        "kind": "consumed_by",
+        "role_name": "input",
+        "quantity": 1.0,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": null,
+        "byproduct": null,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_form_to_intermediate",
+        "source_id": "use_form_part",
+        "target_id": "use_intermediate_part",
+        "kind": "produces",
+        "role_name": "intermediate",
+        "quantity": 1.0,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": null,
+        "byproduct": false,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_intermediate_to_finish",
+        "source_id": "use_intermediate_part",
+        "target_id": "use_finish_part",
+        "kind": "consumed_by",
+        "role_name": "intermediate",
+        "quantity": 1.0,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": null,
+        "byproduct": null,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_finish_to_final",
+        "source_id": "use_finish_part",
+        "target_id": "use_finished_product",
+        "kind": "produces",
+        "role_name": "final",
+        "quantity": 1.0,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": null,
+        "byproduct": false,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_forming_assignment",
+        "source_id": "use_forming_station",
+        "target_id": "use_form_part",
+        "kind": "performs",
+        "role_name": null,
+        "quantity": null,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": "assigned",
+        "byproduct": null,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_finishing_assignment",
+        "source_id": "use_finishing_station",
+        "target_id": "use_finish_part",
+        "kind": "performs",
+        "role_name": null,
+        "quantity": null,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": "assigned",
+        "byproduct": null,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      },
+      {
+        "id": "rel_form_precedes_finish",
+        "source_id": "use_form_part",
+        "target_id": "use_finish_part",
+        "kind": "succeeds",
+        "role_name": null,
+        "quantity": null,
+        "unit": null,
+        "lower_bound": null,
+        "upper_bound": null,
+        "modality": null,
+        "byproduct": null,
+        "per": null,
+        "join": null,
+        "min_offset": null,
+        "max_offset": null,
+        "offset_unit": null
+      }
+    ]
+  }
+}

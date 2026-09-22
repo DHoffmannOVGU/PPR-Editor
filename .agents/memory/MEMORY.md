@@ -1,0 +1,15 @@
+- [React Flow PPR boundary](react-flow-ppr.md) — keep graph rendering separate from the canonical PPR semantic model and persistence path.
+- [React Flow selection state](react-flow-selection.md) — keep transient canvas selection from feeding back into controlled nodes during remounts.
+- [Mutation error notifications](mutation-error-notifications.md) — keep graph mutations owned by persistent workspace surfaces so failures remain visible after dialogs close.
+- [Process specification export](process-specification-export.md) — keep shareable drawings deterministic and derived from the same review projection.
+- [Cross-runtime PPR fixtures](cross-runtime-ppr-fixtures.md) — keep one JSON registry with thin Vite, Python, and Playwright adapters.
+- [Standalone PPR export lowering](standalone-ppr-export.md) — standards exporters must lower unassigned usages to deterministic implicit definitions.
+- [Resource visibility on creation](resource-visibility-on-creation.md) — newly created standalone resources must be selected or linked to appear under the graph’s resource filter.
+- [Same-type graph gestures](same-type-graph-gestures.md) — reserve same-type drags for intentional merges and provide a separate path for hierarchy relationships.
+- [Exchange round-trip semantics](exchange-round-trip-semantics.md) — normalize declared datatypes and treat generated IDs/layout as format noise while checking all engineering meaning.
+- [Collaboration reconnect queue](collaboration-reconnect-queue.md) — retain one in-flight and one latest pending snapshot; client IDs make lost-ack retries idempotent.
+- [Center alignment guides](center-alignment-guides.md) — graph dragging uses transient center-only guides with a small snap tolerance.
+- [Collaboration socket credentials](collaboration-socket-credentials.md) — browser WebSocket proxies may strip subprotocols, so scope membership cookies to each session.
+- [Playwright browser support](playwright-browser-support.md) — qualify Chromium desktop, Firefox smoke, and narrow Chromium separately; current Nix cannot launch WebKit.
+- [Relationship kind contract](relationship-kind-contract.md) — canonical persisted kinds must match PprRelationshipKind; legacy aliases stay in the input-only enum.
+- [Starter model persistence](starter-model-persistence.md) — refresh persisted example data after changing the shared starter scenario registry.

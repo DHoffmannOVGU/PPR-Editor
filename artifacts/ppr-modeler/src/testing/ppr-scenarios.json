@@ -1,0 +1,228 @@
+{
+  "version": 2,
+  "scenarios": [
+    {
+      "id": "two-stage-finished-product",
+      "label": "Two-stage finished product",
+      "description": "Transform an input product into an intermediate and then a final product across two resourced processes.",
+      "characteristics": ["valid", "starter", "product-flow", "resource-assignment"],
+      "loadable": true,
+      "expected": { "valid": true, "issueIncludes": [], "elementCount": 7, "relationshipCount": 7 },
+      "model": {
+        "id": "model_two_stage_finished_product",
+        "name": "Two-Stage Finished Product",
+        "description": "A compact production line with an input, an intermediate product, a final product, two processes, and one dedicated resource for each process.",
+        "library": {
+          "definitions": [
+            { "id": "def_raw_material", "name": "Raw Material", "type": "product", "kind": "definition", "definition_id": null, "description": "Incoming material for the first operation.", "attributes": [{ "id": "attr_raw_material_grade", "name": "material grade", "value": "AL-6061-T6", "datatype": "string", "unit": null }, { "id": "attr_raw_material_supplier", "name": "supplier code", "value": "SUP-AL-01", "datatype": "string", "unit": null }], "x": 80, "y": 250 },
+            { "id": "def_intermediate_part", "name": "Intermediate Part", "type": "product", "kind": "definition", "definition_id": null, "description": "Part produced by the first operation and consumed by the second.", "attributes": [{ "id": "attr_intermediate_target_mass", "name": "target mass", "value": "0.82", "datatype": "real", "unit": "kg" }, { "id": "attr_intermediate_tolerance", "name": "dimensional tolerance", "value": "0.1", "datatype": "real", "unit": "mm" }], "x": 620, "y": 250 },
+            { "id": "def_finished_product", "name": "Finished Product", "type": "product", "kind": "definition", "definition_id": null, "description": "Final product released after the second operation.", "attributes": [{ "id": "attr_finished_part_number", "name": "part number", "value": "FP-100", "datatype": "string", "unit": null }, { "id": "attr_finished_release_status", "name": "release status", "value": "released", "datatype": "string", "unit": null }], "x": 1160, "y": 250 },
+            { "id": "def_form_part", "name": "Form Part", "type": "process", "kind": "definition", "definition_id": null, "description": "Form the incoming material into the intermediate part.", "attributes": [{ "id": "attr_form_cycle_time", "name": "cycle time", "value": "18", "datatype": "real", "unit": "s" }, { "id": "attr_form_mode", "name": "operation mode", "value": "automatic", "datatype": "string", "unit": null }], "x": 350, "y": 80 },
+            { "id": "def_finish_part", "name": "Finish Part", "type": "process", "kind": "definition", "definition_id": null, "description": "Finish and release the intermediate part.", "attributes": [{ "id": "attr_finish_cycle_time", "name": "cycle time", "value": "24", "datatype": "real", "unit": "s" }, { "id": "attr_finish_inspection", "name": "inspection required", "value": true, "datatype": "boolean", "unit": null }], "x": 890, "y": 80 },
+            { "id": "def_forming_station", "name": "Forming Station", "type": "resource", "kind": "definition", "definition_id": null, "description": "Dedicated station for the forming operation.", "attributes": [{ "id": "attr_forming_capacity", "name": "rated capacity", "value": "120", "datatype": "integer", "unit": null }, { "id": "attr_forming_control", "name": "control mode", "value": "automatic", "datatype": "string", "unit": null }], "x": 350, "y": 500 },
+            { "id": "def_finishing_station", "name": "Finishing Station", "type": "resource", "kind": "definition", "definition_id": null, "description": "Dedicated station for the finishing operation.", "attributes": [{ "id": "attr_finishing_capacity", "name": "rated capacity", "value": "90", "datatype": "integer", "unit": null }, { "id": "attr_finishing_gate", "name": "quality gate", "value": "dimensional", "datatype": "string", "unit": null }], "x": 890, "y": 500 }
+          ]
+        },
+        "diagram": {
+          "usages": [
+            { "id": "use_raw_material", "name": "Raw Material Infeed", "type": "product", "kind": "usage", "definition_id": "def_raw_material", "description": "Material entering the line.", "attributes": [{ "id": "attr_raw_material_lot", "name": "lot id", "value": "RM-2401", "datatype": "string", "unit": null }, { "id": "attr_raw_material_available", "name": "availability", "value": "allocated", "datatype": "string", "unit": null }], "x": 80, "y": 250 },
+            { "id": "use_intermediate_part", "name": "Intermediate Part", "type": "product", "kind": "usage", "definition_id": "def_intermediate_part", "description": "Part passed from forming to finishing.", "attributes": [{ "id": "attr_intermediate_mass", "name": "measured mass", "value": "0.82", "datatype": "real", "unit": "kg" }, { "id": "attr_intermediate_state", "name": "state", "value": "formed", "datatype": "string", "unit": null }], "x": 620, "y": 250 },
+            { "id": "use_finished_product", "name": "Finished Product", "type": "product", "kind": "usage", "definition_id": "def_finished_product", "description": "Released output of the line.", "attributes": [{ "id": "attr_finished_serial", "name": "serial number", "value": "FP-100-0001", "datatype": "string", "unit": null }, { "id": "attr_finished_release", "name": "release status", "value": "released", "datatype": "string", "unit": null }], "x": 1160, "y": 250 },
+            { "id": "use_form_part", "name": "Form Part", "type": "process", "kind": "usage", "definition_id": "def_form_part", "description": "First production operation.", "attributes": [{ "id": "attr_form_actual_cycle", "name": "actual cycle time", "value": "18.4", "datatype": "real", "unit": "s" }, { "id": "attr_form_operator", "name": "operator mode", "value": "automatic", "datatype": "string", "unit": null }], "x": 350, "y": 80 },
+            { "id": "use_finish_part", "name": "Finish Part", "type": "process", "kind": "usage", "definition_id": "def_finish_part", "description": "Second production operation.", "attributes": [{ "id": "attr_finish_actual_cycle", "name": "actual cycle time", "value": "24.1", "datatype": "real", "unit": "s" }, { "id": "attr_finish_result", "name": "inspection result", "value": "passed", "datatype": "string", "unit": null }], "x": 890, "y": 80 },
+            { "id": "use_forming_station", "name": "Forming Station FS-01", "type": "resource", "kind": "usage", "definition_id": "def_forming_station", "description": "Resource assigned to forming.", "attributes": [{ "id": "attr_forming_station_asset_id", "name": "asset id", "value": "FS-01", "datatype": "string", "unit": null }, { "id": "attr_forming_station_status", "name": "availability", "value": "available", "datatype": "string", "unit": null }], "x": 350, "y": 500 },
+            { "id": "use_finishing_station", "name": "Finishing Station FN-01", "type": "resource", "kind": "usage", "definition_id": "def_finishing_station", "description": "Resource assigned to finishing.", "attributes": [{ "id": "attr_finishing_station_asset_id", "name": "asset id", "value": "FN-01", "datatype": "string", "unit": null }, { "id": "attr_finishing_station_status", "name": "availability", "value": "available", "datatype": "string", "unit": null }], "x": 890, "y": 500 }
+          ],
+          "relationships": [
+            { "id": "rel_raw_to_form", "source_id": "use_raw_material", "target_id": "use_form_part", "kind": "consumed_by", "quantity": 1, "role_name": "input" },
+            { "id": "rel_form_to_intermediate", "source_id": "use_form_part", "target_id": "use_intermediate_part", "kind": "produces", "quantity": 1, "role_name": "intermediate" },
+            { "id": "rel_intermediate_to_finish", "source_id": "use_intermediate_part", "target_id": "use_finish_part", "kind": "consumed_by", "quantity": 1, "role_name": "intermediate" },
+            { "id": "rel_finish_to_final", "source_id": "use_finish_part", "target_id": "use_finished_product", "kind": "produces", "quantity": 1, "role_name": "final" },
+            { "id": "rel_forming_assignment", "source_id": "use_forming_station", "target_id": "use_form_part", "kind": "performs", "modality": "assigned" },
+            { "id": "rel_finishing_assignment", "source_id": "use_finishing_station", "target_id": "use_finish_part", "kind": "performs", "modality": "assigned" },
+            { "id": "rel_form_precedes_finish", "source_id": "use_form_part", "target_id": "use_finish_part", "kind": "succeeds" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "body-side-spot-welding",
+      "label": "Body-side spot welding",
+      "description": "Fixture, weld, and inspect a stamped automotive body-side assembly.",
+      "characteristics": ["valid", "automotive", "process-decomposition", "resource-cell"],
+      "loadable": true,
+      "expected": { "valid": true, "issueIncludes": [], "elementCount": 13, "relationshipCount": 17 },
+      "model": {
+        "id": "model_body_side_spot_welding",
+        "name": "Body-Side Spot-Welding Cell",
+        "description": "Locate a reinforcement on a body-side panel, resistance-weld the joint set, and verify the welds.",
+        "library": {
+          "definitions": [
+            { "id": "def_body_side_panel", "name": "Body-Side Panel", "type": "product", "kind": "definition", "definition_id": null, "description": "Stamped galvanized-steel outer panel.", "attributes": [{ "id": "attr_panel_material", "name": "material", "value": "DX54D+Z", "datatype": "string", "unit": null }, { "id": "attr_panel_thickness", "name": "thickness", "value": "0.8", "datatype": "real", "unit": "mm" }], "x": 80, "y": 260 },
+            { "id": "def_reinforcement_bracket", "name": "Reinforcement Bracket", "type": "product", "kind": "definition", "definition_id": null, "description": "Stamped reinforcement for the inner panel.", "attributes": [{ "id": "attr_bracket_material", "name": "material", "value": "DP600", "datatype": "string", "unit": null }], "x": 80, "y": 430 },
+            { "id": "def_positioned_panel_assembly", "name": "Positioned Panel Assembly", "type": "product", "kind": "definition", "definition_id": null, "description": "Panel and reinforcement clamped in joining position.", "attributes": [], "x": 650, "y": 300 },
+            { "id": "def_welded_body_side", "name": "Welded Body Side", "type": "product", "kind": "definition", "definition_id": null, "description": "Body-side assembly after resistance spot welding.", "attributes": [{ "id": "attr_weld_count", "name": "weld count", "value": "24", "datatype": "integer", "unit": null }], "x": 980, "y": 300 },
+            { "id": "def_inspected_body_side", "name": "Inspected Body Side", "type": "product", "kind": "definition", "definition_id": null, "description": "Welded body side released after inspection.", "attributes": [], "x": 1320, "y": 300 },
+            { "id": "def_body_side_production", "name": "Produce Body Side", "type": "process", "kind": "definition", "definition_id": null, "description": "Complete body-side joining cycle.", "attributes": [{ "id": "attr_takt_time", "name": "takt time", "value": "45", "datatype": "real", "unit": "s" }], "x": 680, "y": 80 },
+            { "id": "def_fixture_components", "name": "Fixture Components", "type": "process", "kind": "definition", "definition_id": null, "description": "Load, locate, and clamp the stamped components.", "attributes": [{ "id": "attr_fixture_time", "name": "cycle time", "value": "8", "datatype": "real", "unit": "s" }], "x": 420, "y": 260 },
+            { "id": "def_spot_weld_joint_set", "name": "Spot-Weld Joint Set", "type": "process", "kind": "definition", "definition_id": null, "description": "Apply the released resistance spot-weld schedule.", "attributes": [{ "id": "attr_weld_current", "name": "weld current", "value": "9500", "datatype": "real", "unit": "A" }], "x": 790, "y": 260 },
+            { "id": "def_inspect_welds", "name": "Inspect Welds", "type": "process", "kind": "definition", "definition_id": null, "description": "Check weld presence and electrode indentation.", "attributes": [{ "id": "attr_inspection_time", "name": "cycle time", "value": "6", "datatype": "real", "unit": "s" }], "x": 1130, "y": 260 },
+            { "id": "def_welding_cell", "name": "Body-Side Welding Cell", "type": "resource", "kind": "definition", "definition_id": null, "description": "Guarded cell containing joining and inspection equipment.", "attributes": [], "x": 680, "y": 650 },
+            { "id": "def_locating_fixture", "name": "Pneumatic Locating Fixture", "type": "resource", "kind": "definition", "definition_id": null, "description": "Dedicated locating and clamping fixture.", "attributes": [], "x": 420, "y": 520 },
+            { "id": "def_welding_robot", "name": "Servo-Gun Welding Robot", "type": "resource", "kind": "definition", "definition_id": null, "description": "Six-axis robot with a servo welding gun.", "attributes": [{ "id": "attr_robot_payload", "name": "payload", "value": "165", "datatype": "real", "unit": "kg" }], "x": 790, "y": 520 },
+            { "id": "def_weld_camera", "name": "Weld Inspection Camera", "type": "resource", "kind": "definition", "definition_id": null, "description": "Industrial camera and lighting for weld inspection.", "attributes": [], "x": 1130, "y": 520 }
+          ]
+        },
+        "diagram": {
+          "usages": [
+            { "id": "use_body_side_panel", "name": "Panel at Infeed", "type": "product", "kind": "usage", "definition_id": "def_body_side_panel", "description": "One panel presented to the cell.", "attributes": [], "x": 80, "y": 260 },
+            { "id": "use_reinforcement_bracket", "name": "Bracket at Infeed", "type": "product", "kind": "usage", "definition_id": "def_reinforcement_bracket", "description": "One reinforcement presented to the cell.", "attributes": [], "x": 80, "y": 430 },
+            { "id": "use_positioned_panel_assembly", "name": "Clamped Panel Assembly", "type": "product", "kind": "usage", "definition_id": "def_positioned_panel_assembly", "description": "Located assembly passed to welding.", "attributes": [], "x": 650, "y": 300 },
+            { "id": "use_welded_body_side", "name": "Welded Body Side", "type": "product", "kind": "usage", "definition_id": "def_welded_body_side", "description": "Joined assembly awaiting inspection.", "attributes": [], "x": 980, "y": 300 },
+            { "id": "use_inspected_body_side", "name": "Released Body Side", "type": "product", "kind": "usage", "definition_id": "def_inspected_body_side", "description": "Accepted cell output.", "attributes": [], "x": 1320, "y": 300 },
+            { "id": "use_body_side_production", "name": "Body-Side Production Cycle", "type": "process", "kind": "usage", "definition_id": "def_body_side_production", "description": "One complete cell cycle.", "attributes": [], "x": 680, "y": 80 },
+            { "id": "use_fixture_components", "name": "Fixture Panel and Bracket", "type": "process", "kind": "usage", "definition_id": "def_fixture_components", "description": "Loading and clamping operation.", "attributes": [], "x": 420, "y": 260 },
+            { "id": "use_spot_weld_joint_set", "name": "Weld Joint Set", "type": "process", "kind": "usage", "definition_id": "def_spot_weld_joint_set", "description": "Robot joining operation.", "attributes": [], "x": 790, "y": 260 },
+            { "id": "use_inspect_welds", "name": "Inspect Weld Pattern", "type": "process", "kind": "usage", "definition_id": "def_inspect_welds", "description": "Automatic weld inspection.", "attributes": [], "x": 1130, "y": 260 },
+            { "id": "use_welding_cell", "name": "Welding Cell WS-10", "type": "resource", "kind": "usage", "definition_id": "def_welding_cell", "description": "Installed body-side cell.", "attributes": [{ "id": "attr_cell_asset_id", "name": "asset id", "value": "WS-10", "datatype": "string", "unit": null }], "x": 680, "y": 650 },
+            { "id": "use_locating_fixture", "name": "Fixture FX-10", "type": "resource", "kind": "usage", "definition_id": "def_locating_fixture", "description": "Fixture installed in WS-10.", "attributes": [], "x": 420, "y": 520 },
+            { "id": "use_welding_robot", "name": "Robot RB-10", "type": "resource", "kind": "usage", "definition_id": "def_welding_robot", "description": "Joining robot installed in WS-10.", "attributes": [], "x": 790, "y": 520 },
+            { "id": "use_weld_camera", "name": "Camera VI-10", "type": "resource", "kind": "usage", "definition_id": "def_weld_camera", "description": "Inspection camera installed in WS-10.", "attributes": [], "x": 1130, "y": 520 }
+          ],
+          "relationships": [
+            { "id": "rel_production_contains_fixture", "source_id": "use_body_side_production", "target_id": "use_fixture_components", "kind": "contains" },
+            { "id": "rel_production_contains_welding", "source_id": "use_body_side_production", "target_id": "use_spot_weld_joint_set", "kind": "contains" },
+            { "id": "rel_production_contains_inspection", "source_id": "use_body_side_production", "target_id": "use_inspect_welds", "kind": "contains" },
+            { "id": "rel_cell_contains_fixture", "source_id": "use_welding_cell", "target_id": "use_locating_fixture", "kind": "contains" },
+            { "id": "rel_cell_contains_robot", "source_id": "use_welding_cell", "target_id": "use_welding_robot", "kind": "contains" },
+            { "id": "rel_cell_contains_camera", "source_id": "use_welding_cell", "target_id": "use_weld_camera", "kind": "contains" },
+            { "id": "rel_panel_input", "source_id": "use_body_side_panel", "target_id": "use_fixture_components", "kind": "consumed_by", "quantity": 1, "role_name": "panel" },
+            { "id": "rel_bracket_input", "source_id": "use_reinforcement_bracket", "target_id": "use_fixture_components", "kind": "consumed_by", "quantity": 1, "role_name": "reinforcement" },
+            { "id": "rel_positioned_output", "source_id": "use_fixture_components", "target_id": "use_positioned_panel_assembly", "kind": "produces", "quantity": 1, "role_name": "positionedAssembly" },
+            { "id": "rel_positioned_input", "source_id": "use_positioned_panel_assembly", "target_id": "use_spot_weld_joint_set", "kind": "consumed_by", "quantity": 1, "role_name": "positionedAssembly" },
+            { "id": "rel_welded_output", "source_id": "use_spot_weld_joint_set", "target_id": "use_welded_body_side", "kind": "produces", "quantity": 1, "role_name": "weldedBodySide" },
+            { "id": "rel_welded_input", "source_id": "use_welded_body_side", "target_id": "use_inspect_welds", "kind": "consumed_by", "quantity": 1, "role_name": "weldedBodySide" },
+            { "id": "rel_inspected_output", "source_id": "use_inspect_welds", "target_id": "use_inspected_body_side", "kind": "produces", "quantity": 1, "role_name": "acceptedBodySide" },
+            { "id": "rel_fixture_performs_loading", "source_id": "use_locating_fixture", "target_id": "use_fixture_components", "kind": "performs" },
+            { "id": "rel_robot_performs_welding", "source_id": "use_welding_robot", "target_id": "use_spot_weld_joint_set", "kind": "performs" },
+            { "id": "rel_camera_performs_inspection", "source_id": "use_weld_camera", "target_id": "use_inspect_welds", "kind": "performs" },
+            { "id": "rel_cell_supports_production", "source_id": "use_welding_cell", "target_id": "use_body_side_production", "kind": "performs", "modality": "supports" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "ev-battery-module-assembly",
+      "label": "EV battery-module assembly",
+      "description": "Assemble, laser-weld, and electrically test a battery module.",
+      "characteristics": ["valid", "battery", "assembly", "quality-test"],
+      "loadable": true,
+      "expected": { "valid": true, "issueIncludes": [], "elementCount": 11, "relationshipCount": 12 },
+      "model": {
+        "id": "model_ev_battery_module_assembly",
+        "name": "EV Battery-Module Assembly",
+        "description": "Load a cell stack and busbar carrier, laser-join the interconnects, and perform an electrical end-of-line test.",
+        "library": { "definitions": [
+          { "id": "def_cell_stack", "name": "Cell Stack", "type": "product", "kind": "definition", "definition_id": null, "description": "Matched prismatic cells compressed into a stack.", "attributes": [{ "id": "attr_cell_count", "name": "cell count", "value": "12", "datatype": "integer", "unit": null }], "x": 80, "y": 250 },
+          { "id": "def_busbar_carrier", "name": "Busbar Carrier", "type": "product", "kind": "definition", "definition_id": null, "description": "Insulated carrier with copper interconnects.", "attributes": [], "x": 80, "y": 420 },
+          { "id": "def_loaded_module", "name": "Loaded Battery Module", "type": "product", "kind": "definition", "definition_id": null, "description": "Cell stack and carrier located in the fixture.", "attributes": [], "x": 560, "y": 300 },
+          { "id": "def_joined_module", "name": "Laser-Joined Battery Module", "type": "product", "kind": "definition", "definition_id": null, "description": "Module after busbar joining.", "attributes": [], "x": 900, "y": 300 },
+          { "id": "def_verified_module", "name": "Electrically Verified Battery Module", "type": "product", "kind": "definition", "definition_id": null, "description": "Module released by electrical test.", "attributes": [{ "id": "attr_nominal_voltage", "name": "nominal voltage", "value": "44.4", "datatype": "real", "unit": "V" }], "x": 1240, "y": 300 },
+          { "id": "def_load_module", "name": "Load Module Components", "type": "process", "kind": "definition", "definition_id": null, "description": "Locate and clamp the stack and carrier.", "attributes": [], "x": 380, "y": 260 },
+          { "id": "def_laser_join_busbars", "name": "Laser-Join Busbars", "type": "process", "kind": "definition", "definition_id": null, "description": "Join each busbar to its cell terminal.", "attributes": [{ "id": "attr_laser_power", "name": "laser power", "value": "2.5", "datatype": "real", "unit": "kW" }], "x": 730, "y": 260 },
+          { "id": "def_electrical_eol_test", "name": "Electrical End-of-Line Test", "type": "process", "kind": "definition", "definition_id": null, "description": "Measure isolation, continuity, and voltage.", "attributes": [], "x": 1070, "y": 260 },
+          { "id": "def_module_fixture", "name": "Module Assembly Fixture", "type": "resource", "kind": "definition", "definition_id": null, "description": "Servo-clamped module fixture.", "attributes": [], "x": 380, "y": 520 },
+          { "id": "def_laser_station", "name": "Laser Welding Station", "type": "resource", "kind": "definition", "definition_id": null, "description": "Enclosed fiber-laser station.", "attributes": [], "x": 730, "y": 520 },
+          { "id": "def_eol_tester", "name": "Battery EOL Tester", "type": "resource", "kind": "definition", "definition_id": null, "description": "Electrical safety and functional tester.", "attributes": [], "x": 1070, "y": 520 }
+        ] },
+        "diagram": {
+          "usages": [
+            { "id": "use_cell_stack", "name": "Matched Cell Stack", "type": "product", "kind": "usage", "definition_id": "def_cell_stack", "description": "Stack allocated to the module.", "attributes": [], "x": 80, "y": 250 },
+            { "id": "use_busbar_carrier", "name": "Busbar Carrier at Infeed", "type": "product", "kind": "usage", "definition_id": "def_busbar_carrier", "description": "Carrier allocated to the module.", "attributes": [], "x": 80, "y": 420 },
+            { "id": "use_loaded_module", "name": "Clamped Module", "type": "product", "kind": "usage", "definition_id": "def_loaded_module", "description": "Loaded module awaiting joining.", "attributes": [], "x": 560, "y": 300 },
+            { "id": "use_joined_module", "name": "Joined Module", "type": "product", "kind": "usage", "definition_id": "def_joined_module", "description": "Joined module awaiting test.", "attributes": [], "x": 900, "y": 300 },
+            { "id": "use_verified_module", "name": "Released Battery Module", "type": "product", "kind": "usage", "definition_id": "def_verified_module", "description": "Accepted output module.", "attributes": [], "x": 1240, "y": 300 },
+            { "id": "use_load_module", "name": "Load Cell Stack and Carrier", "type": "process", "kind": "usage", "definition_id": "def_load_module", "description": "Loading operation.", "attributes": [], "x": 380, "y": 260 },
+            { "id": "use_laser_join_busbars", "name": "Join Cell Interconnects", "type": "process", "kind": "usage", "definition_id": "def_laser_join_busbars", "description": "Laser joining operation.", "attributes": [], "x": 730, "y": 260 },
+            { "id": "use_electrical_eol_test", "name": "Verify Module Electrically", "type": "process", "kind": "usage", "definition_id": "def_electrical_eol_test", "description": "Electrical test operation.", "attributes": [], "x": 1070, "y": 260 },
+            { "id": "use_module_fixture", "name": "Fixture BF-20", "type": "resource", "kind": "usage", "definition_id": "def_module_fixture", "description": "Installed module fixture.", "attributes": [], "x": 380, "y": 520 },
+            { "id": "use_laser_station", "name": "Laser Station LW-20", "type": "resource", "kind": "usage", "definition_id": "def_laser_station", "description": "Installed joining station.", "attributes": [], "x": 730, "y": 520 },
+            { "id": "use_eol_tester", "name": "EOL Tester ET-20", "type": "resource", "kind": "usage", "definition_id": "def_eol_tester", "description": "Installed electrical tester.", "attributes": [], "x": 1070, "y": 520 }
+          ],
+          "relationships": [
+            { "id": "rel_stack_input", "source_id": "use_cell_stack", "target_id": "use_load_module", "kind": "consumed_by", "quantity": 1, "role_name": "cellStack" },
+            { "id": "rel_carrier_input", "source_id": "use_busbar_carrier", "target_id": "use_load_module", "kind": "consumed_by", "quantity": 1, "role_name": "busbarCarrier" },
+            { "id": "rel_loaded_output", "source_id": "use_load_module", "target_id": "use_loaded_module", "kind": "produces", "quantity": 1, "role_name": "loadedModule" },
+            { "id": "rel_loaded_input", "source_id": "use_loaded_module", "target_id": "use_laser_join_busbars", "kind": "consumed_by", "quantity": 1, "role_name": "loadedModule" },
+            { "id": "rel_joined_output", "source_id": "use_laser_join_busbars", "target_id": "use_joined_module", "kind": "produces", "quantity": 1, "role_name": "joinedModule" },
+            { "id": "rel_joined_input", "source_id": "use_joined_module", "target_id": "use_electrical_eol_test", "kind": "consumed_by", "quantity": 1, "role_name": "joinedModule" },
+            { "id": "rel_verified_output", "source_id": "use_electrical_eol_test", "target_id": "use_verified_module", "kind": "produces", "quantity": 1, "role_name": "verifiedModule" },
+            { "id": "rel_fixture_performs_load", "source_id": "use_module_fixture", "target_id": "use_load_module", "kind": "performs" },
+            { "id": "rel_laser_performs_join", "source_id": "use_laser_station", "target_id": "use_laser_join_busbars", "kind": "performs" },
+            { "id": "rel_tester_performs_test", "source_id": "use_eol_tester", "target_id": "use_electrical_eol_test", "kind": "performs" },
+            { "id": "rel_load_precedes_join", "source_id": "use_load_module", "target_id": "use_laser_join_busbars", "kind": "succeeds" },
+            { "id": "rel_join_precedes_test", "source_id": "use_laser_join_busbars", "target_id": "use_electrical_eol_test", "kind": "succeeds" }
+          ]
+        }
+      }
+    },
+    {
+      "id": "centrifugal-pump-final-assembly",
+      "label": "Centrifugal-pump final assembly",
+      "description": "Assemble a pump, pressure-test its casing, and verify hydraulic performance.",
+      "characteristics": ["valid", "pump", "final-assembly", "verification"],
+      "loadable": true,
+      "expected": { "valid": true, "issueIncludes": [], "elementCount": 12, "relationshipCount": 13 },
+      "model": {
+        "id": "model_centrifugal_pump_final_assembly",
+        "name": "Centrifugal-Pump Final Assembly",
+        "description": "Install the rotating assembly and seal, leak-test the casing, and verify the pump duty point.",
+        "library": { "definitions": [
+          { "id": "def_pump_casing", "name": "Machined Pump Casing", "type": "product", "kind": "definition", "definition_id": null, "description": "Clean machined casing ready for assembly.", "attributes": [{ "id": "attr_casing_material", "name": "material", "value": "EN-GJL-250", "datatype": "string", "unit": null }], "x": 80, "y": 230 },
+          { "id": "def_rotating_assembly", "name": "Rotating Assembly", "type": "product", "kind": "definition", "definition_id": null, "description": "Balanced shaft, bearings, and impeller.", "attributes": [], "x": 80, "y": 380 },
+          { "id": "def_mechanical_seal", "name": "Mechanical Seal", "type": "product", "kind": "definition", "definition_id": null, "description": "Cartridge seal selected for the duty.", "attributes": [], "x": 80, "y": 530 },
+          { "id": "def_assembled_pump", "name": "Assembled Centrifugal Pump", "type": "product", "kind": "definition", "definition_id": null, "description": "Mechanically complete pump before verification.", "attributes": [], "x": 660, "y": 300 },
+          { "id": "def_pressure_tested_pump", "name": "Pressure-Tested Centrifugal Pump", "type": "product", "kind": "definition", "definition_id": null, "description": "Assembled pump accepted by the hydrostatic leak test.", "attributes": [], "x": 930, "y": 300 },
+          { "id": "def_released_pump", "name": "Released Centrifugal Pump", "type": "product", "kind": "definition", "definition_id": null, "description": "Pump released after pressure and performance tests.", "attributes": [{ "id": "attr_rated_flow", "name": "rated flow", "value": "50", "datatype": "real", "unit": null }], "x": 1240, "y": 300 },
+          { "id": "def_assemble_pump", "name": "Assemble Pump", "type": "process", "kind": "definition", "definition_id": null, "description": "Install internals, close the casing, and torque fasteners.", "attributes": [{ "id": "attr_assembly_time", "name": "cycle time", "value": "22", "datatype": "real", "unit": "min" }], "x": 400, "y": 280 },
+          { "id": "def_hydrostatic_test", "name": "Hydrostatic Leak Test", "type": "process", "kind": "definition", "definition_id": null, "description": "Pressurize the casing and check leakage.", "attributes": [{ "id": "attr_test_pressure", "name": "test pressure", "value": "1500000", "datatype": "real", "unit": "Pa" }], "x": 780, "y": 280 },
+          { "id": "def_performance_test", "name": "Hydraulic Performance Test", "type": "process", "kind": "definition", "definition_id": null, "description": "Measure flow, head, vibration, and power.", "attributes": [], "x": 1060, "y": 280 },
+          { "id": "def_assembly_station", "name": "Pump Assembly Station", "type": "resource", "kind": "definition", "definition_id": null, "description": "Assembly bench with guided torque tools.", "attributes": [], "x": 400, "y": 560 },
+          { "id": "def_pressure_test_bench", "name": "Pressure Test Bench", "type": "resource", "kind": "definition", "definition_id": null, "description": "Hydrostatic test bench with pressure decay measurement.", "attributes": [], "x": 780, "y": 560 },
+          { "id": "def_pump_test_bench", "name": "Pump Performance Test Bench", "type": "resource", "kind": "definition", "definition_id": null, "description": "Closed-loop hydraulic test bench.", "attributes": [], "x": 1060, "y": 560 }
+        ] },
+        "diagram": {
+          "usages": [
+            { "id": "use_pump_casing", "name": "Casing for Order", "type": "product", "kind": "usage", "definition_id": "def_pump_casing", "description": "Casing allocated to the order.", "attributes": [], "x": 80, "y": 230 },
+            { "id": "use_rotating_assembly", "name": "Balanced Rotating Assembly", "type": "product", "kind": "usage", "definition_id": "def_rotating_assembly", "description": "Rotating assembly allocated to the order.", "attributes": [], "x": 80, "y": 380 },
+            { "id": "use_mechanical_seal", "name": "Selected Mechanical Seal", "type": "product", "kind": "usage", "definition_id": "def_mechanical_seal", "description": "Seal allocated to the order.", "attributes": [], "x": 80, "y": 530 },
+            { "id": "use_assembled_pump", "name": "Pump after Assembly", "type": "product", "kind": "usage", "definition_id": "def_assembled_pump", "description": "Pump awaiting verification.", "attributes": [], "x": 660, "y": 300 },
+            { "id": "use_pressure_tested_pump", "name": "Pump after Pressure Test", "type": "product", "kind": "usage", "definition_id": "def_pressure_tested_pump", "description": "Leak-tight pump awaiting hydraulic performance verification.", "attributes": [], "x": 930, "y": 300 },
+            { "id": "use_released_pump", "name": "Released Pump", "type": "product", "kind": "usage", "definition_id": "def_released_pump", "description": "Accepted output of final assembly.", "attributes": [], "x": 1240, "y": 300 },
+            { "id": "use_assemble_pump", "name": "Assemble Production Pump", "type": "process", "kind": "usage", "definition_id": "def_assemble_pump", "description": "Final assembly operation.", "attributes": [], "x": 400, "y": 280 },
+            { "id": "use_hydrostatic_test", "name": "Pressure-Test Pump", "type": "process", "kind": "usage", "definition_id": "def_hydrostatic_test", "description": "Hydrostatic verification operation.", "attributes": [], "x": 780, "y": 280 },
+            { "id": "use_performance_test", "name": "Verify Pump Duty Point", "type": "process", "kind": "usage", "definition_id": "def_performance_test", "description": "Hydraulic performance operation.", "attributes": [], "x": 1060, "y": 280 },
+            { "id": "use_assembly_station", "name": "Assembly Station AS-30", "type": "resource", "kind": "usage", "definition_id": "def_assembly_station", "description": "Installed assembly station.", "attributes": [], "x": 400, "y": 560 },
+            { "id": "use_pressure_test_bench", "name": "Pressure Bench PT-30", "type": "resource", "kind": "usage", "definition_id": "def_pressure_test_bench", "description": "Installed pressure bench.", "attributes": [], "x": 780, "y": 560 },
+            { "id": "use_pump_test_bench", "name": "Performance Bench PB-30", "type": "resource", "kind": "usage", "definition_id": "def_pump_test_bench", "description": "Installed performance bench.", "attributes": [], "x": 1060, "y": 560 }
+          ],
+          "relationships": [
+            { "id": "rel_casing_input", "source_id": "use_pump_casing", "target_id": "use_assemble_pump", "kind": "consumed_by", "quantity": 1, "role_name": "casing" },
+            { "id": "rel_rotor_input", "source_id": "use_rotating_assembly", "target_id": "use_assemble_pump", "kind": "consumed_by", "quantity": 1, "role_name": "rotatingAssembly" },
+            { "id": "rel_seal_input", "source_id": "use_mechanical_seal", "target_id": "use_assemble_pump", "kind": "consumed_by", "quantity": 1, "role_name": "mechanicalSeal" },
+            { "id": "rel_assembled_output", "source_id": "use_assemble_pump", "target_id": "use_assembled_pump", "kind": "produces", "quantity": 1, "role_name": "assembledPump" },
+            { "id": "rel_pressure_input", "source_id": "use_assembled_pump", "target_id": "use_hydrostatic_test", "kind": "consumed_by", "quantity": 1, "role_name": "pumpUnderTest" },
+            { "id": "rel_pressure_output", "source_id": "use_hydrostatic_test", "target_id": "use_pressure_tested_pump", "kind": "produces", "quantity": 1, "role_name": "pressureTestedPump" },
+            { "id": "rel_performance_input", "source_id": "use_pressure_tested_pump", "target_id": "use_performance_test", "kind": "consumed_by", "quantity": 1, "role_name": "pumpUnderTest" },
+            { "id": "rel_released_output", "source_id": "use_performance_test", "target_id": "use_released_pump", "kind": "produces", "quantity": 1, "role_name": "releasedPump" },
+            { "id": "rel_station_performs_assembly", "source_id": "use_assembly_station", "target_id": "use_assemble_pump", "kind": "performs" },
+            { "id": "rel_pressure_bench_performs_test", "source_id": "use_pressure_test_bench", "target_id": "use_hydrostatic_test", "kind": "performs" },
+            { "id": "rel_performance_bench_performs_test", "source_id": "use_pump_test_bench", "target_id": "use_performance_test", "kind": "performs" },
+            { "id": "rel_assembly_precedes_pressure", "source_id": "use_assemble_pump", "target_id": "use_hydrostatic_test", "kind": "succeeds" },
+            { "id": "rel_pressure_precedes_performance", "source_id": "use_hydrostatic_test", "target_id": "use_performance_test", "kind": "succeeds" }
+          ]
+        }
+      }
+    }
+  ]
+}

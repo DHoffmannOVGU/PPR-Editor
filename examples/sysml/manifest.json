@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "fixtures": [
+    {
+      "id": "minimal-flow",
+      "file": "01_minimal_flow.portable.sysml",
+      "mode": "portable",
+      "focus": ["input-output", "performer", "typed-attributes"],
+      "expected": {
+        "definitionCount": 4,
+        "usageCount": 4,
+        "relationshipCount": 3,
+        "relationshipKinds": ["consumed_by", "produces", "performs"]
+      }
+    },
+    {
+      "id": "nested-cell",
+      "file": "02_nested_cell.portable.sysml",
+      "mode": "portable",
+      "focus": ["process-hierarchy", "resource-hierarchy", "succession", "allocation"],
+      "expected": {
+        "definitionCount": 9,
+        "usageCount": 9,
+        "relationshipCount": 12,
+        "relationshipKinds": ["contains", "consumed_by", "produces", "performs", "succeeds"]
+      }
+    },
+    {
+      "id": "parallel-inspection",
+      "file": "03_parallel_inspection.portable.sysml",
+      "mode": "portable",
+      "focus": ["parallel-branches", "shared-input", "multiple-resources"],
+      "expected": {
+        "definitionCount": 7,
+        "usageCount": 7,
+        "relationshipCount": 6,
+        "relationshipKinds": ["consumed_by", "produces", "performs"]
+      }
+    },
+    {
+      "id": "transfer-multiplicity",
+      "file": "04_transfer_multiplicity.portable.sysml",
+      "mode": "portable",
+      "focus": ["product-transfer", "quantity", "multiplicity", "containment"],
+      "expected": {
+        "definitionCount": 3,
+        "usageCount": 4,
+        "relationshipCount": 1,
+        "relationshipKinds": ["contains"]
+      }
+    },
+    {
+      "id": "perform-and-support",
+      "file": "05_perform_and_support.portable.sysml",
+      "mode": "portable",
+      "focus": ["performer", "support-allocation", "input-output"],
+      "expected": {
+        "definitionCount": 5,
+        "usageCount": 5,
+        "relationshipCount": 4,
+        "relationshipKinds": ["consumed_by", "produces", "performs"]
+      }
+    },
+    {
+      "id": "identity-and-properties",
+      "file": "06_identity_and_properties.portable.sysml",
+      "mode": "portable",
+      "focus": ["stable-identities", "duplicate-long-names", "quoted-names", "typed-attributes"],
+      "expectedParserDiagnostics": 4,
+      "expected": {
+        "definitionCount": 4,
+        "usageCount": 4,
+        "relationshipCount": 3,
+        "relationshipKinds": ["consumed_by", "produces", "performs"]
+      }
+    },
+    {
+      "id": "ppr-keywords",
+      "file": "07_ppr_keywords.profile.sysml",
+      "mode": "ppr",
+      "focus": ["semantic-metadata", "user-keywords", "input-output", "performer"],
+      "expected": {
+        "definitionCount": 4,
+        "usageCount": 4,
+        "relationshipCount": 3,
+        "relationshipKinds": ["consumed_by", "produces", "performs"]
+      }
+    }
+  ]
+}

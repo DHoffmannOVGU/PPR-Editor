@@ -1,0 +1,20 @@
+[project]
+name = "repl-nix-workspace"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "automationml",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "lxml>=6.1.2",
+    "mcp[cli]>=2.2.0",
+    "opensysml>=0.4.0",
+    "pydantic>=2.13.5",
+    "pytest>=9.1.1",
+    "uvicorn>=0.52.4",
+    "websockets>=17.1",
+]
+
+[tool.uv.sources]
+automationml = { git = "https://github.com/AutomationML/automationml-python.git" }

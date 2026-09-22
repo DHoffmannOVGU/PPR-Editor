@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "PPR Engineering Modeler"
+description = "A lightweight production-engineering modeler for Products, Processes, and Resources, with semantic relationships, property editing, validation, JSON persistence, and export previews."
+version = "1.0.0"
+id = "artifacts/ppr-modeler"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23220
+
+[services.development]
+run = "pnpm --filter @workspace/ppr-modeler run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/ppr-modeler", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/ppr-modeler/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23220"
+BASE_PATH = "/"

@@ -1,0 +1,1377 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: PPR engineering modeler API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: model
+    description: Canonical PPR semantic model operations
+  - name: collaboration
+    description: Temporary shared modeling sessions
+paths:
+  /auth/session:
+    get:
+      operationId: getAuthenticatedIdentity
+      tags: [collaboration]
+      summary: Establish or read the authenticated browser identity
+      responses:
+        "200":
+          description: Authenticated browser identity
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthenticatedIdentity"
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /collaboration/sessions:
+    post:
+      operationId: createCollaborationSession
+      tags: [collaboration]
+      summary: Open a temporary collaboration session from the current model
+      security:
+        - identityCookie: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Session credentials for the owner
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationCreateResponse"
+        "401":
+          description: Authenticated identity required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /collaboration/join:
+    post:
+      operationId: joinCollaborationSession
+      tags: [collaboration]
+      summary: Resolve a collaboration session and its current model
+      security:
+        - identityCookie: []
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaborationJoinRequest"
+      responses:
+        "200":
+          description: Current collaboration session state
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CollaborationJoinResponse"
+        "404":
+          description: Invalid session or access code
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authenticated identity required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /collaboration/sessions/{sessionId}/close:
+    post:
+      operationId: closeCollaborationSession
+      tags: [collaboration]
+      summary: Close a collaboration session for every participant
+      security:
+        - identityCookie: []
+        - bearerAuth: []
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CollaborationCloseRequest"
+      responses:
+        "204":
+          description: Session closed
+        "403":
+          description: Owner membership rejected
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Authenticated session owner required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model:
+    get:
+      operationId: getModel
+      tags: [model]
+      summary: Get the current engineering model
+      responses:
+        "200":
+          description: Current PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+    put:
+      operationId: saveModel
+      tags: [model]
+      summary: Replace and persist the current engineering model
+      parameters:
+        - name: checkpoint
+          in: query
+          required: false
+          description: Create a saved revision when the model differs from the latest checkpoint
+          schema:
+            type: boolean
+            default: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PprModel"
+      responses:
+        "200":
+          description: Saved PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "422":
+          description: Incomplete or invalid semantic model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateModelMetadata
+      tags: [model]
+      summary: Safely update the current model name or description
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModelMetadataUpdate"
+      responses:
+        "200":
+          description: Updated PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "422":
+          description: No supported metadata field was supplied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/relationship-rules:
+    get:
+      operationId: getRelationshipRules
+      tags: [model]
+      summary: Get valid source and target types for every relationship kind
+      responses:
+        "200":
+          description: PPR relationship rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelationshipRules"
+  /model/revisions:
+    get:
+      operationId: getModelRevisions
+      tags: [model]
+      summary: List concise revisions for the active engineering model
+      responses:
+        "200":
+          description: Revisions ordered from newest to oldest
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModelRevisionSummary"
+    post:
+      operationId: createModelCheckpoint
+      tags: [model]
+      summary: Save an explicit revision after a group of incremental writes
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModelCheckpointRequest"
+      responses:
+        "200":
+          description: Current saved revision
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModelRevisionSummary"
+  /model/revisions/{revisionId}:
+    get:
+      operationId: getModelRevision
+      tags: [model]
+      summary: Inspect one immutable model revision
+      parameters:
+        - name: revisionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Immutable model revision with its snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprRevision"
+        "404":
+          description: Revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/revisions/{revisionId}/restore:
+    post:
+      operationId: restoreModelRevision
+      tags: [model]
+      summary: Restore an earlier model revision as a new current revision
+      parameters:
+        - name: revisionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Restored PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "404":
+          description: Revision not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/example:
+    post:
+      operationId: loadExampleModel
+      tags: [model]
+      summary: Load the built-in production example
+      responses:
+        "200":
+          description: Example PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+  /model/reset:
+    post:
+      operationId: resetModel
+      tags: [model]
+      summary: Create a new empty model
+      responses:
+        "200":
+          description: Empty PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+  /model/import/sysml:
+    post:
+      operationId: importSysmlModel
+      tags: [model]
+      summary: Import a portable or PPR-profiled SysML v2 model
+      requestBody:
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: Imported and persisted PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "422":
+          description: Invalid SysML or PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/import/automationml:
+    post:
+      operationId: importAutomationmlModel
+      tags: [model]
+      summary: Import the PPR AutomationML profile
+      requestBody:
+        required: true
+        content:
+          application/xml:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: Imported and persisted PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "422":
+          description: Invalid AutomationML or PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/validate:
+    post:
+      operationId: validateModel
+      tags: [model]
+      summary: Validate a PPR model without persisting it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PprModel"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+  /model/items:
+    get:
+      operationId: getItems
+      tags: [model]
+      summary: Derive the complete product-item lifecycle partition
+      responses:
+        "200":
+          description: Product usages grouped into identity chains
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PprItem"
+  /model/items/infer:
+    post:
+      operationId: inferItems
+      tags: [model]
+      summary: Propose or explicitly apply identity links inferred from process flow
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IdentityInferenceRequest"
+      responses:
+        "200":
+          description: Reviewable identity proposals
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IdentityInferenceResult"
+  /model/elements:
+    post:
+      operationId: createElement
+      tags: [model]
+      summary: Create a Product, Process, or Resource usage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElementInput"
+      responses:
+        "201":
+          description: Created element
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+  /model/definitions:
+    post:
+      operationId: createDefinition
+      tags: [model]
+      summary: Create a reusable Product, Process, or Resource definition
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DefinitionInput"
+      responses:
+        "201":
+          description: Created library definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+  /model/definitions/{definitionId}:
+    get:
+      operationId: getDefinition
+      tags: [model]
+      summary: Get one reusable library definition
+      parameters:
+        - $ref: "#/components/parameters/DefinitionId"
+      responses:
+        "200":
+          description: Library definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+        "404":
+          description: Library definition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateDefinition
+      tags: [model]
+      summary: Update a reusable library definition
+      parameters:
+        - $ref: "#/components/parameters/DefinitionId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DefinitionUpdate"
+      responses:
+        "200":
+          description: Updated library definition
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+        "404":
+          description: Library definition not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteDefinition
+      tags: [model]
+      summary: Delete an unused library definition
+      parameters:
+        - $ref: "#/components/parameters/DefinitionId"
+      responses:
+        "204":
+          description: Library definition deleted
+        "409":
+          description: Definition is still referenced by diagram usages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/elements/{elementId}:
+    get:
+      operationId: getElement
+      tags: [model]
+      summary: Get one diagram usage
+      parameters:
+        - $ref: "#/components/parameters/ElementId"
+      responses:
+        "200":
+          description: Diagram usage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+        "404":
+          description: Diagram usage not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateElement
+      tags: [model]
+      summary: Update an engineering element
+      parameters:
+        - $ref: "#/components/parameters/ElementId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ElementUpdate"
+      responses:
+        "200":
+          description: Updated element
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprElement"
+        "404":
+          description: Element not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteElement
+      tags: [model]
+      summary: Delete an element and its relationships
+      parameters:
+        - $ref: "#/components/parameters/ElementId"
+      responses:
+        "204":
+          description: Element deleted
+  /model/relationships:
+    post:
+      operationId: createRelationship
+      tags: [model]
+      summary: Create a domain-aware semantic relationship
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipInput"
+      responses:
+        "201":
+          description: Created relationship
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprRelationship"
+        "422":
+          description: Invalid relationship for the selected element types
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/relationships/{relationshipId}:
+    get:
+      operationId: getRelationship
+      tags: [model]
+      summary: Get one semantic relationship
+      parameters:
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Semantic relationship
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprRelationship"
+        "404":
+          description: Relationship not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateRelationship
+      tags: [model]
+      summary: Update relationship quantity and unit
+      parameters:
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipUpdate"
+      responses:
+        "200":
+          description: Updated relationship
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprRelationship"
+        "404":
+          description: Relationship not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Invalid relationship metadata
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteRelationship
+      tags: [model]
+      summary: Delete a semantic relationship
+      parameters:
+        - name: relationshipId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Relationship deleted
+  /model/merge:
+    post:
+      operationId: mergeModelUsages
+      tags: [model]
+      summary: Atomically merge two same-type diagram usages
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MergeUsagesRequest"
+      responses:
+        "200":
+          description: Merged and persisted PPR model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PprModel"
+        "422":
+          description: Merge decisions would produce an invalid model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /model/export/{format}:
+    get:
+      operationId: exportModel
+      tags: [model]
+      summary: Export the canonical model
+      parameters:
+        - name: format
+          in: path
+          required: true
+          schema:
+            type: string
+            enum: [json, sysml, sysml-ppr, automationml]
+      responses:
+        "200":
+          description: Exported model
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportResult"
+            text/plain:
+              schema:
+                type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    identityCookie:
+      type: apiKey
+      in: cookie
+      name: ppr_identity
+    collaborationMembership:
+      type: apiKey
+      in: header
+      name: X-Collaboration-Token
+  parameters:
+    ElementId:
+      name: elementId
+      in: path
+      required: true
+      schema:
+        type: string
+    DefinitionId:
+      name: definitionId
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    AuthenticatedIdentity:
+      type: object
+      required: [id, display_name]
+      properties:
+        id:
+          type: string
+        display_name:
+          type: string
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    CollaborationCreateResponse:
+      type: object
+      required: [session_id, code, owner_token, member_token, role, expires_at]
+      properties:
+        session_id:
+          type: string
+        code:
+          type: string
+        owner_token:
+          type: string
+        member_token:
+          type: string
+        role:
+          type: string
+          enum: [owner, editor, viewer]
+        expires_at:
+          type: string
+          format: date-time
+    CollaborationJoinRequest:
+      type: object
+      required: [session_id, code]
+      properties:
+        session_id:
+          type: string
+        code:
+          type: string
+          minLength: 6
+          maxLength: 6
+    CollaborationJoinResponse:
+      type: object
+      required: [session_id, expires_at, revision, participant_count, model, member_token, role]
+      properties:
+        session_id:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        revision:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        participant_count:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        model:
+          $ref: "#/components/schemas/PprModel"
+        member_token:
+          type: string
+        role:
+          type: string
+          enum: [owner, editor, viewer]
+    CollaborationCloseRequest:
+      type: object
+      required: []
+      properties:
+        owner_token:
+          type: string
+    Attribute:
+      type: object
+      required: [id, name, value]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        value:
+          type: ["string", "number", "boolean"]
+        datatype:
+          type: ["string", "null"]
+        unit:
+          type: ["string", "null"]
+    PprElement:
+      type: object
+      required: [id, name, type, kind, attributes, x, y, visible_in_ppr]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum: [product, process, resource]
+        kind:
+          type: string
+          enum: [definition, usage]
+        definition_id:
+          type: ["string", "null"]
+        domain:
+          type: ["string", "null"]
+          description: Optional library collection or engineering domain for definitions.
+        parent_definition_id:
+          type: ["string", "null"]
+          description: Optional broader same-type definition in the library ontology.
+        description:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
+        x:
+          type: number
+        y:
+          type: number
+        visible_in_ppr:
+          type: boolean
+          default: true
+          description: Whether this usage is included in the canonical PPR diagram.
+        state:
+          type: ["string", "null"]
+          description: Lifecycle state for a product usage.
+        states:
+          type: ["array", "null"]
+          description: Ordered lifecycle vocabulary for a product definition.
+          items:
+            type: string
+    PprLibrary:
+      type: object
+      required: [definitions]
+      properties:
+        definitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/PprElement"
+    PprDiagram:
+      type: object
+      required: [usages, relationships]
+      properties:
+        usages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PprElement"
+        relationships:
+          type: array
+          items:
+            $ref: "#/components/schemas/PprRelationship"
+    PprRelationship:
+      type: object
+      required: [id, source_id, target_id, kind]
+      properties:
+        id:
+          type: string
+        source_id:
+          type: string
+        target_id:
+          type: string
+        kind:
+          type: string
+          enum:
+            - consumed_by
+            - produces
+            - performs
+            - succeeds
+            - contains
+            - becomes
+        quantity:
+          type: ["number", "null"]
+          minimum: 0
+        unit:
+          type: ["string", "null"]
+        role_name:
+          type: ["string", "null"]
+        lower_bound:
+          type: ["number", "null"]
+          minimum: 0
+          multipleOf: 1
+        upper_bound:
+          oneOf:
+            - type: number
+              minimum: 0
+              multipleOf: 1
+            - type: string
+              enum: ["*"]
+            - type: "null"
+        modality:
+          type: ["string", "null"]
+          enum: [assigned, capable, supports, null]
+        byproduct:
+          type: ["boolean", "null"]
+        per:
+          type: ["string", "null"]
+          enum: [cycle, unit, batch, hour, null]
+        join:
+          type: ["string", "null"]
+          enum: [and, or, null]
+        min_offset:
+          type: ["number", "null"]
+        max_offset:
+          type: ["number", "null"]
+        offset_unit:
+          type: ["string", "null"]
+    PprModel:
+      type: object
+      required: [id, name, description, library, diagram]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        schema_version:
+          type: string
+          default: "2.0"
+        library:
+          $ref: "#/components/schemas/PprLibrary"
+        diagram:
+          $ref: "#/components/schemas/PprDiagram"
+    ModelMetadataUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        description:
+          type: string
+    ModelCheckpointRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 200
+          default: Agent checkpoint
+    RelationshipEndpointRule:
+      type: object
+      required: [source, target]
+      properties:
+        source:
+          type: string
+          enum: [product, process, resource]
+        target:
+          type: string
+          enum: [product, process, resource]
+    RelationshipRules:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/RelationshipEndpointRule"
+    ModelRevisionSummary:
+      type: object
+      required:
+        - id
+        - revision
+        - created_at
+        - created_by
+        - summary
+        - model_name
+        - element_count
+        - relationship_count
+        - is_current
+      properties:
+        id:
+          type: string
+        revision:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        summary:
+          type: string
+        model_name:
+          type: string
+        element_count:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        relationship_count:
+          type: number
+          minimum: 0
+          multipleOf: 1
+        is_current:
+          type: boolean
+    PprRevision:
+      allOf:
+        - $ref: "#/components/schemas/ModelRevisionSummary"
+        - type: object
+          required: [model]
+          properties:
+            model:
+              $ref: "#/components/schemas/PprModel"
+    ElementInput:
+      type: object
+      additionalProperties: false
+      required: [name, type]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [product, process, resource]
+        definition_id:
+          type: ["string", "null"]
+        description:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
+        visible_in_ppr:
+          type: boolean
+          default: true
+          description: Whether the new usage is included in the canonical PPR diagram.
+        state:
+          type: ["string", "null"]
+    ElementUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        definition_id:
+          type: ["string", "null"]
+        description:
+          type: string
+        x:
+          type: number
+        y:
+          type: number
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
+        visible_in_ppr:
+          type: boolean
+          description: Whether this usage is included in the canonical PPR diagram.
+        state:
+          type: ["string", "null"]
+    DefinitionInput:
+      type: object
+      additionalProperties: false
+      required: [name, type]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        type:
+          type: string
+          enum: [product, process, resource]
+        domain:
+          type: ["string", "null"]
+          maxLength: 80
+        parent_definition_id:
+          type: ["string", "null"]
+        description:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
+        states:
+          type: ["array", "null"]
+          items:
+            type: string
+    DefinitionUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        name:
+          type: string
+          minLength: 1
+        domain:
+          type: ["string", "null"]
+          maxLength: 80
+        parent_definition_id:
+          type: ["string", "null"]
+        description:
+          type: string
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attribute"
+        states:
+          type: ["array", "null"]
+          items:
+            type: string
+    MergeAttributeDecision:
+      type: object
+      required: [name, source]
+      properties:
+        name:
+          type: string
+          minLength: 1
+        source:
+          type: string
+          enum: [first, second, both]
+    MergeUsagesRequest:
+      type: object
+      required:
+        - first_id
+        - second_id
+        - survivor_id
+        - name_source
+        - description_source
+        - definition_source
+        - self_loop_policy
+      properties:
+        first_id:
+          type: string
+        second_id:
+          type: string
+        survivor_id:
+          type: string
+        name_source:
+          type: string
+          enum: [first, second]
+        description_source:
+          type: string
+          enum: [first, second]
+        definition_source:
+          type: string
+          enum: [first, second, none]
+        attribute_decisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/MergeAttributeDecision"
+        self_loop_policy:
+          type: string
+          enum: [reject, drop]
+    RelationshipInput:
+      type: object
+      additionalProperties: false
+      required: [source_id, target_id, kind]
+      properties:
+        source_id:
+          type: string
+        target_id:
+          type: string
+        kind:
+          type: string
+          enum:
+            - input_to
+            - consumed_by
+            - produces
+            - performs
+            - supports
+            - succeeds
+            - flows_to
+            - contains
+            - composed_of
+            - becomes
+        quantity:
+          type: ["number", "null"]
+          minimum: 0
+        unit:
+          type: ["string", "null"]
+        role_name:
+          type: ["string", "null"]
+        lower_bound:
+          type: ["number", "null"]
+          minimum: 0
+          multipleOf: 1
+        upper_bound:
+          oneOf:
+            - type: number
+              minimum: 0
+              multipleOf: 1
+            - type: string
+              enum: ["*"]
+            - type: "null"
+        modality:
+          type: ["string", "null"]
+          enum: [assigned, capable, supports, null]
+        byproduct:
+          type: ["boolean", "null"]
+        per:
+          type: ["string", "null"]
+          enum: [cycle, unit, batch, hour, null]
+        join:
+          type: ["string", "null"]
+          enum: [and, or, null]
+        min_offset:
+          type: ["number", "null"]
+        max_offset:
+          type: ["number", "null"]
+        offset_unit:
+          type: ["string", "null"]
+    RelationshipUpdate:
+      type: object
+      additionalProperties: false
+      properties:
+        role_name:
+          type: ["string", "null"]
+        quantity:
+          type: ["number", "null"]
+          minimum: 0
+        unit:
+          type: ["string", "null"]
+        lower_bound:
+          type: ["number", "null"]
+          minimum: 0
+          multipleOf: 1
+        upper_bound:
+          oneOf:
+            - type: number
+              minimum: 0
+              multipleOf: 1
+            - type: string
+              enum: ["*"]
+            - type: "null"
+        modality:
+          type: ["string", "null"]
+          enum: [assigned, capable, supports, null]
+        byproduct:
+          type: ["boolean", "null"]
+        per:
+          type: ["string", "null"]
+          enum: [cycle, unit, batch, hour, null]
+        join:
+          type: ["string", "null"]
+          enum: [and, or, null]
+        min_offset:
+          type: ["number", "null"]
+        max_offset:
+          type: ["number", "null"]
+        offset_unit:
+          type: ["string", "null"]
+    ItemChainNode:
+      type: object
+      required: [element_id]
+      properties:
+        element_id:
+          type: string
+        state:
+          type: ["string", "null"]
+        produced_by:
+          type: ["string", "null"]
+        consumed_by:
+          type: ["string", "null"]
+    PprItem:
+      type: object
+      required: [id, name, definition_ids, chain]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        definition_ids:
+          type: array
+          items:
+            type: string
+        chain:
+          type: array
+          items:
+            $ref: "#/components/schemas/ItemChainNode"
+        absorbed_into:
+          type: ["string", "null"]
+    IdentityProposal:
+      type: object
+      required: [source_id, target_id, confidence, reason]
+      properties:
+        source_id:
+          type: string
+        target_id:
+          type: string
+        confidence:
+          type: string
+          enum: [high, medium]
+        reason:
+          type: string
+    IdentityInferenceRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        apply:
+          type: boolean
+          default: false
+    IdentityInferenceResult:
+      type: object
+      required: [proposals, needs_review]
+      properties:
+        proposals:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdentityProposal"
+        needs_review:
+          type: array
+          items:
+            type: string
+    ValidationIssue:
+      type: object
+      required: [code, severity, message]
+      properties:
+        code:
+          type: string
+        severity:
+          type: string
+          enum: [error, warning, info]
+        message:
+          type: string
+        element_id:
+          type: ["string", "null"]
+        relationship_id:
+          type: ["string", "null"]
+    ValidationResult:
+      type: object
+      required: [valid, issues]
+      properties:
+        valid:
+          type: boolean
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationIssue"
+    ExportResult:
+      type: object
+      required: [format, content, filename]
+      properties:
+        format:
+          type: string
+        content:
+          type: string
+        filename:
+          type: string
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string

@@ -1,0 +1,22 @@
+{
+  "consumed_by": [
+    { "source": "product", "target": "process" }
+  ],
+  "produces": [
+    { "source": "process", "target": "product" }
+  ],
+  "performs": [
+    { "source": "resource", "target": "process" }
+  ],
+  "succeeds": [
+    { "source": "process", "target": "process" }
+  ],
+  "contains": [
+    { "source": "product", "target": "product" },
+    { "source": "process", "target": "process" },
+    { "source": "resource", "target": "resource" }
+  ],
+  "becomes": [
+    { "source": "product", "target": "product" }
+  ]
+}
