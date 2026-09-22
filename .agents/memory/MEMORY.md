@@ -13,3 +13,4 @@
 - [Playwright browser support](playwright-browser-support.md) — qualify Chromium desktop, Firefox smoke, and narrow Chromium separately; current Nix cannot launch WebKit.
 - [Relationship kind contract](relationship-kind-contract.md) — canonical persisted kinds must match PprRelationshipKind; legacy aliases stay in the input-only enum.
 - [Starter model persistence](starter-model-persistence.md) — refresh persisted example data after changing the shared starter scenario registry.
+- [GitHub publishing path](github-publishing-path.md) — the GitHub OAuth connector can publish through the API even when the local Git remote lacks CLI credentials.
